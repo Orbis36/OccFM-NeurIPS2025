@@ -1,0 +1,44 @@
+MODEL:
+  NAME: VaeSwinX16
+
+  EMBEDDING:
+    NAME: VoxelHeightSemEmbed
+    NUM_CATE: 18
+    FEAT_DIM: 8
+    HEIGHT_NUM: 16
+    OCC_RANGE: [-40, -40, -1, 40, 40, 5.4]
+    VOXEL_SIZE: [0.4, 0.4, 0.4]
+    ENCODER_DIM: 128
+
+  ENCODER:
+    NAME: SwinSingleFrameDownV2
+    PATCH_EMBED_DIM: 128
+    IMG_SIZE: 200
+    PATCH_SIZE: 1
+    INPUT_CHANNEL: 128
+    DEPTH: [2, 6]
+    MLP_RATIO: 4
+    QKV_BIAS: True
+    OUT_DIM: 256 # to neck
+    USE_CHECKPOINTS: False
+    LATENT_DIM: 4
+    DOWNSAMPLE: ['conv', 'conv']
+
+  QUANTIZATION:
+    NAME: VaeQuant
+
+  DECODER:
+    NAME: SwinSingleFrameUpV2
+    INPUT_CHANNEL: 4 # from z
+    DEPTH: [6, 2]
+    PATCH_EMBED_DIM: 128 # dim from neck
+    OUT_DIM: 128
+    MLP_RATIO: 4
+    QKV_BIAS: True
+    USE_CHECKPOINTS: False
+    UPSAMPLE: ['interp', 'interp']
+
+
+
+
+

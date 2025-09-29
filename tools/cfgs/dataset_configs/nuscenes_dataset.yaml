@@ -1,0 +1,14 @@
+DATASET: NuScenesDataset
+DATA_PATH: 'data/nuscenes'
+LABEL_NAME: ['others', 'barrier', 'bicycle', 'bus', 'car', 'construction_vehicle', 'motorcycle', 'pedestrian',
+  'traffic_cone', 'trailer', 'truck', 'driveable_surface', 'other_flat', 'sidewalk', 'terrain', 'manmade', 'vegetation']
+
+HEIGHT: 16
+
+INFO_PATH: {
+    'train': [nuscenes_infos_train_temporal_v3_scene.pkl],
+    'test': [nuscenes_infos_val_temporal_v3_scene.pkl],
+}
+
+
+

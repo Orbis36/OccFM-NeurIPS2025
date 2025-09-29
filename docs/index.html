@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic-Style Research Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+
+    /***** GIF 自适应 *****/
+    .gif-table img{
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+
+    /* === 可复制 BibTeX 代码框 === */
+    .code-box{
+      position: relative;
+      border: 1px solid var(--border-light);
+      border-radius: .5rem;
+      background: #f9fafb;
+      padding: .1rem .1rem;
+      overflow-x: auto;          /* 长行可滚动 */
+      font-family: Menlo, Consolas, monospace;
+      font-size: .85rem;
+      line-height: 1.5;
+    }
+
+    /* 右上角复制按钮 */
+    .copy-btn{
+      position: absolute;
+      top: .5rem;
+      right: .5rem;
+      padding: .25rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;                /* 默认隐藏 */
+      transition: opacity .15s;
+    }
+
+    /* 鼠标移入 code-box 时显示图标 */
+    .code-box:hover .copy-btn{ opacity: 1; }
+
+    /* 图标统一大小 */
+    .copy-btn svg{ width: 18px; height: 18px; fill:#6b7280; }
+    .copy-btn:hover svg{ fill:#374151; }          /* 悬停变深 */
+
+        .hero-title{
+          display:inline-flex;                /* 让 h1 + logo 同一行 */
+          align-items:center;                 /* 垂直居中对齐 */
+          gap:0.1rem;                           /* 标题与 logo 之间间距，可调 */
+        }
+
+    /* logo 尺寸自己定；下面示例让它与两行文字高度差不多 */
+    .hero-title .logo{
+      width: 120px;        /* 高度会等比缩放 */
+      /* 或者 height:48px; width:auto; */
+    }
+
+    /* ====== GIF 展示网格 ====== */
+    .wide-block{
+      width: 1500px;               /* 你想要的“更宽”值，可 100% / 1400px… */
+      position: relative;
+      left: 50%;                   /* 先移动到屏幕正中 */
+      transform: translateX(-50%); /* 再往左折半，把中心对齐 */
+      margin: 1.5rem 0;            /* 上下留白（可调）*/
+    }
+
+    /* 新的两列布局容器 */
+    .comparison-layout{
+      display: flex;
+      gap: 1rem;                                 /* 左右两列之间的间距 */
+      align-items: flex-start;                   /* 顶部对齐 */
+      opacity: 0;                               /* 初始隐藏 */
+      transition: opacity 0.5s ease-in-out;    /* 平滑淡入效果 */
+    }
+
+    /* 加载完成后显示 */
+    .comparison-layout.loaded{
+      opacity: 1;
+    }
+
+    /* 加载提示文字样式 */
+    .loading-indicator{
+      text-align: center;
+      font-size: 1.1rem;
+      color: #6b7280;
+      margin: 2rem 0;
+      opacity: 1;
+      transition: opacity 0.3s ease-out;
+    }
+
+    .loading-indicator.hidden{
+      opacity: 0;
+    }
+
+    /* Ground Truth 列样式 */
+    .ground-truth-column{
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;                               /* 垂直间距 */
+      border: 3px solid #22c55e;                /* 绿色边框 */
+      border-radius: 0.75rem;                   /* 圆角 */
+      padding: 1rem;                            /* 内边距 */
+      background-color: rgba(34, 197, 94, 0.05); /* 淡绿色背景 */
+      flex: 0 0 calc(25% - 0.75rem);            /* 固定宽度：与其他列相同 */
+    }
+
+    /* 比较方法网格样式 */
+    .comparison-grid{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);     /* 3 列等宽 */
+      gap: 0.5rem;                              /* 网格间距 */
+      flex: 1;                                  /* 占据剩余空间 */
+    }
+
+    /* 所有 figure 的通用样式 */
+    .ground-truth-column figure,
+    .comparison-grid figure{
+      margin: 0;                                /* 清掉默认外边距 */
+      text-align: center;                       /* 让标题居中 */
+      transition: transform 0.3s ease; /* 平滑过渡效果 */
+      cursor: pointer;                          /* 鼠标悬停时显示手形光标 */
+      border-radius: 0.75rem;                   /* 圆角边框 */
+    }
+
+    .ground-truth-column figure:hover,
+    .comparison-grid figure:hover{
+      transform: none;                          /* 防止整个figure缩放 */
+    }
+
+    .ground-truth-column figure:hover img,
+    .comparison-grid figure:hover img{
+      transform: scale(2);                   /* 悬停时只放大图片 */
+    }
+
+
+    .ground-truth-column img,
+    .comparison-grid img{
+      width: 100%;            /* 撑满列宽 */
+      height: 200px;          /* 固定高度确保一致性 */
+      object-fit: cover;      /* 保持宽高比并填满容器 */
+      border-radius: .5rem;   /* 圆角，如果不要可删 */
+      transition: transform 0.3s ease; /* 图片缩放过渡效果 */
+      /* 可选阴影： */
+      /* filter: drop-shadow(0 4px 8px rgba(0,0,0,.12)); */
+    }
+
+    .ground-truth-column figcaption,
+    .comparison-grid figcaption{
+      font-size: .9rem;
+      margin-top: .4rem;
+      color: #4b5563;         /* 略浅灰，可按需换 */
+    }
+
+
+    /* 加在原先 .comparison-grid 定义 **后面** —— 利用权重覆盖原来的 3 列 */
+    .comparison-grid.two-col{
+      grid-template-columns: repeat(2, 1fr);   /* 2 列 */
+    }
+
+    /* 让新网格里的 figure / img 继承同样的交互效果 */
+    .comparison-grid.two-col figure{
+      margin: 0;
+      text-align: center;
+      transition: transform .3s ease;
+      cursor: pointer;
+      border-radius: 0.75rem;                   /* 圆角边框 */
+    }
+    .comparison-grid.two-col figure:hover{
+      transform: none;                          /* 防止整个figure缩放 */
+    }
+
+    .comparison-grid.two-col figure:hover img{
+      transform: scale(2);                   /* 悬停时只放大图片 */
+    }
+    .comparison-grid.two-col img{
+      width: 100%;
+      height: 200px;          /* 如需自适应可改成 auto */
+      object-fit: cover;
+      border-radius: .5rem;
+      transition: transform 0.3s ease; /* 图片缩放过渡效果 */
+    }
+
+    /* 只影响 dense-sparse 网格里的图片，不动前面 3×4 的那一组 */
+    .comparison-grid.dense-sparse img{
+      height: auto;           /* 让高度随宽度自适应 */
+      max-height: 280px;      /* 想限制行高就设个上限，随意调 */
+      object-fit: contain;    /* 完整显示，留白不用裁切 */
+    }
+
+    /* 如果想让 caption 文字离图片别太近，加一点 margin */
+    .comparison-grid.dense-sparse figcaption{
+      margin-bottom: 0.4rem;
+    }
+
+    /* Ground Truth 列标题的特殊样式 */
+    .ground-truth-column figcaption{
+      color: #16a34a;         /* 绿色标题 */
+      font-weight: 600;       /* 加粗 */
+    }
+
+    .comparison-grid.dense-sparse{
+      column-gap: 1.5rem;  /* 横向间距 */
+      row-gap:    1.2rem;  /* 纵向间距 */
+      justify-items: center;  /* 让窄 GIF 居中，不都贴左边 */
+    }
+
+        /* ------- Dense-Sparse 专属调优 ------- */
+    .comparison-grid.dense-sparse{
+      column-gap: .8rem;      /* 横向缩窄 */
+      row-gap:    1.2rem;     /* 纵向跟上面保持 */
+      max-width: 1050px;      /* 整体别撑那么宽 */
+      margin: 0 auto;         /* 居中 */
+    }
+
+    /* 图片再放大一些（可自行调 320 / 360）*/
+    .comparison-grid.dense-sparse img{
+      max-height: 340px;      /* >280px，比例不变 */
+    }
+
+    /* —— 绿色高亮 —— */
+    .comparison-grid.dense-sparse figure.gt{
+      border: 3px solid #22c55e;                /* 绿色边框 */
+      border-radius: 0.75rem;                   /* 圆角 */
+      background-color: rgba(34, 197, 94, 0.05); /* 淡绿色背景 */
+      padding: 1rem;                            /* 内边距 */
+    }
+
+    .comparison-grid.dense-sparse figure.gt img{
+      border: none;                             /* 移除图片边框，改用figure边框 */
+      border-radius: .5rem;                     /* 保持图片圆角 */
+      background: transparent;                  /* 移除图片背景，改用figure背景 */
+      transition: transform 0.3s ease;         /* 图片缩放过渡效果 */
+    }
+
+    .comparison-grid.dense-sparse figure.gt:hover{
+      transform: none;                          /* 防止整个figure缩放 */
+    }
+
+    .comparison-grid.dense-sparse figure.gt:hover img{
+      transform: scale(2);                   /* 悬停时只放大图片 */
+    }
+
+    .comparison-grid.dense-sparse figure.gt figcaption{
+      color:#16a34a;
+      font-weight:600;
+    }
+
+    /* ========= Paper meta ========= */
+    .paper-meta      { text-align: center; margin-top: 0.75rem; }
+    .paper-meta p    { margin: .3rem 0; }
+
+    .btn-code { font-size: 0.9rem; }   /* 0.78rem ≈ 12.5px，可自行调 */
+
+    .authors{
+        font-size: 1.3rem;     /* 原来 1rem → 现在 ≈ 19px */
+        font-weight: 600;
+        line-height: 2;     /* 稍微拉开行高 */
+        margin-bottom: 1rem; /* 与单位行距离 */
+      }
+
+    .affils{
+        font-size: 1.1rem;     /* 原来 .85rem */
+        line-height: 1.8;
+        color:#6b7280;
+        margin-bottom: 0.5rem; /* 与脚注、按钮之间距离 */
+      }
+
+    .paper-meta{
+      margin-top: 1rem;    /* 原来 .75rem */
+    }
+
+    /* ---------- 圆角按钮 ---------- */
+    .paper-links       { display: inline-flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    .paper-links .btn {            /* 让图标 + 文字水平排列 */
+      display:inline-flex;
+      align-items:center;
+      gap:.4rem;
+    }
+
+    .icon {                        /* 控制图标大小，随意改 */
+      width:1rem;
+      height:1rem;
+    }
+
+    .btn{
+      padding: 0.01rem 1.2rem;      /* 上下 0.25rem，左右 0.9rem */
+      border-radius: 999px;       /* 继续用圆丸角 */
+      background: var(--bg-light);
+    }
+    .btn:hover         { background: #eef1f4; }
+
+    :root {
+      --sidebar-w: 240px;
+      --bg-light: #f7f8fa;
+      --border-light: #e3e5e8;
+      --text: #111827;
+      --accent: #0070f3;
+      --heading-color: #2d3d50; /* new heading color */
+    }
+
+    img.shadow {
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+      }
+
+    /* emphasis */
+    .metric {
+      color: #ff8b8a;
+      font-weight: 700;
+    }
+
+    /* image intro*/
+    .note {
+      max-width: 72%;
+      margin: 1rem auto;   /* 上下间距 1rem，左右居中 */
+      text-align: center;
+      font-size: 0.95rem;  /* 略小一点，随意调 */
+      line-height: 1.6;
+    }
+
+    /* subsection */
+    h3.subsection {
+      text-align: center;   /* 居中 */
+      font-size: 1.3rem;      /* 比默认 1.1rem 略小，你也可以用 0.95rem、0.9rem… */
+      font-weight: 600;     /* 保持粗细一致 */
+      margin: 1.2rem 0 0.6rem;  /* 上下间距可微调 */
+      color: var(--heading-color); /* 颜色跟其他标题一致 */
+    }
+
+
+    /* === Reset === */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.7; color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: var(--accent); text-decoration: underline; }
+
+    /* === Sidebar === */
+    nav {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); background: var(--bg-light);
+      border-right: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 0 1.4rem; overflow-y: auto; text-align: left;
+    }
+    nav h1 { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; width: 100%; }
+    nav h1::after { content: ""; display: block; width: 100%; height: 1px; background: var(--border-light); margin-top: 0.75rem; }
+    nav ul { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; width: 100%; }
+    nav li a { font-size: 0.9rem; font-weight: 600; display: inline-block; width: 100%; }
+    nav .sublist { list-style: none; margin-top: 0.5rem; padding-left: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+    nav .sublist li a { font-size: 0.82rem; font-weight: 400; }
+    .num { margin-right: 0.3rem; font-weight: 500; }
+
+    /* === Main === */
+    main { margin-left: var(--sidebar-w); padding: 3rem 1rem 5rem; display: flex; justify-content: center; }
+    .content { max-width: 1000px; width: 100%; }
+
+    .hero { text-align: center; margin-bottom: 3rem; }
+    .hero-img { width: 120px; margin: 0 auto 1.2rem; }
+    .title { font-size: 2.4rem; font-weight: 800; line-height: 1.25; max-width: 900px; margin: 0 auto 1.15rem; color: var(--heading-color); } /* enlarged max-width */
+    .title .gradient { background: linear-gradient(90deg, #d65adc 0%, #65c3ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Sections */
+    section { margin: 3rem 0; }
+    section h2 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: var(--heading-color);
+    }
+    section h3 { font-size: 1.1rem; font-weight: 600; margin: 1.3rem 0 0.6rem; color: var(--heading-color); }
+    img, video { width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
+
+    /* === Responsive === */
+    @media (max-width: 900px) {
+      nav { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-light); flex-direction: row; justify-content: flex-start; align-items: center; padding: 1rem 0.8rem; }
+      nav h1 { display: none; }
+      nav ul { flex-direction: row; gap: 1rem; flex-wrap: wrap; }
+      nav .sublist { display: none; }
+      main { margin-left: 0; }
+    }
+    .nowrap{white-space:nowrap;}
+
+    /* --- 响应式 GIF 网格修复 (最终版 V3) --- */
+
+    /* 1. 仅当屏幕装不下 1500px 时，才让容器自适应 */
+    @media (max-width: 1550px) {
+      .wide-block {
+        width: 95%; /* 从固定的 1500px 改为灵活的百分比宽度 */
+      }
+    }
+
+    /* 2. 在更窄的屏幕上调整网格 (手机端适配) */
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      .ground-truth-column {
+        padding: 0.5rem;
+        border-width: 2px;
+      }
+    }
+
+        /* --- 新增：逐行结果展示样式 --- */
+
+    /* 初始隐藏，等待JS加载后显示 */
+    .comparison-container {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+    .comparison-container.loaded {
+        opacity: 1;
+    }
+
+    /* 每一行结果（包含GIF网格和下面的文字）的容器 */
+    .result-row {
+        margin-bottom: 2.5rem; /* 行与行之间的垂直间距 */
+    }
+
+    /* 存放4个并排GIF的网格 */
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 定义一个四列等宽的网格 */
+        gap: 0.8rem; /* 网格项之间的间距 */
+        align-items: flex-start;
+        margin-bottom: 1rem; /* GIF网格和下方描述文字的间距 */
+    }
+
+    /* 网格中所有 figure 的通用样式 */
+    .result-grid figure {
+        margin: 0;
+        text-align: center;
+        position: relative; /* 用于悬停放大效果 */
+    }
+
+    /* 网格中所有 img 的通用样式 */
+    .result-grid img {
+        width: 100%;
+        height: auto;
+        border-radius: .5rem;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    /* 网格中所有 figcaption 的通用样式 */
+    .result-grid figcaption {
+        font-size: .9rem;
+        /* * 使用 margin 简写:
+         * 第一个值 1rem 代表 上下外边距
+         * 第二个值 0 代表 左右外边距
+         */
+        margin: 2rem 0;
+        color: #4b5563;
+    }
+
+    .result-grid figure {
+    margin: 0;
+    text-align: center;
+    position: relative; /* 用于悬停放大效果, 这个属性必须保留 */
+    }
+
+    /* 鼠标悬停时图片放大效果 */
+    .result-grid figure:hover img {
+        transform: scale(2);
+    }
+
+    /* 新增这条规则：当鼠标悬停在 figure 上时，提升它自身的层级 */
+    .result-grid figure:hover {
+        z-index: 20; /* 或者任何大于默认值 0 的数字都可以 */
+    }
+
+    /* 单独设置 Ground Truth 项的特殊样式（绿色边框等）*/
+    .result-grid .gt-item {
+        border: 3px solid #22c55e;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        background-color: rgba(34, 197, 94, 0.05);
+    }
+
+    .result-grid .gt-item figcaption {
+        color: #16a34a;
+        font-weight: 600;
+    }
+
+    /* 手机端适配：当屏幕小于768px时，网格变为2列 */
+    @media (max-width: 768px) {
+        .result-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* 手机端适配：当屏幕小于480px时，网格变为1列 */
+    @media (max-width: 480px) {
+        .result-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <div>
+      <h1>Contents</h1>
+      <ul>
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#Main results">Main results</a>
+          <ul class="sublist">
+            <li><a href="#Cross-domain"><span class="num">1.</span>Cross domain analyse</a></li>
+            <li><a href="#Performance-evaluation"><span class="num">2.</span>Performance evaluation</a></li>
+            <li><a href="#More-Visualization"><span class="num">3.</span>Semantic Occ. Visualization</a></li>
+            <li><a href="#Dense-Vis"><span class="num">4.</span>Den./Spa. Occ. Pretrain Vis.</a></li>
+          </ul>
+        </li>
+        <li><a href="#bibtex">BibTeX</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="content">
+
+       <header class="hero">
+        <!-- <img class="hero-img" src="images/logo.svg" alt="Project logo" /> -->
+        <div class="hero-title">
+          <img class="logo" src="/OccFM/docs/source/images/logo.png" alt="Project logo">
+          <h1 class="title"><span class="nowrap">Towards foundational LiDAR world models </span><br><span class="nowrap">with efficient latent flow matching</span></h1>
+        </div>
+        <div class="paper-meta">
+          <!-- 作者行 -->
+          <p class="authors">
+            Tianran Liu<sup></sup>,
+            Shengwen Zhao<sup></sup>,
+            Nicholas Rhinehart<sup></sup>
+          </p>
+
+          <p class="affils">
+            University of Toronto
+          </p>
+
+          <div class="paper-links">
+            <!-- href="https://arxiv.org/abs/2506.23434" -->
+            <a class="btn btn-code"  href="https://arxiv.org/abs/2506.23434" target="_blank">
+              <img class="icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/arxiv.svg" alt="" />
+              Arxiv
+            </a>
+
+            <a class="btn btn-code" target="_blank">
+              <img class="icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/github.svg" alt="" />
+              Code (coming soon)
+            </a>
+          </div>
+        </div>
+
+       </header>
+
+
+
+
+      <section id="abstract"><h2>Abstract</h2>
+<p>LiDAR-based world models offer more structured and geometry-aware representations than their image-based counterparts. However, existing LiDAR world models are narrowly trained; each model excels only in the domain for which it was built. <strong>
+  Can we develop LiDAR world models that exhibit strong transferability across multiple domains?</strong><br><br>
+  We conduct the first systematic domain-transfer study across three demanding scenarios: <em>(i)</em> <strong>outdoor-to-indoor generalization</strong>, <em>(ii)</em> <strong>sparse-beam & dense-beam adaptation</strong>, and <em>(iii)</em>
+  <strong>non-semantic-to-semantic transfer.</strong>
+  Across different fine-tuning budgets, a single pre-trained model attains up to <span class="metric"><strong>11% absolute (83% relative) </strong></span> improvement over training from scratch and wins in 30/36 comparisons.
+  This transferability dramatically reduces reliance on manual annotation for semantic occupancy forecasting: our method surpasses previous models using only <span class="metric"><strong>5%</strong></span> of the labeled data they require.
+  We also identify inefficiencies in current LiDAR world models—chiefly under-compression of LiDAR data and sub‑optimal training objectives. To tackle this, we introduce a <strong>latent conditional flow‑matching (CFM)</strong>
+  framework that reaches state‑of‑the‑art reconstruction accuracy with <span class="metric"><strong>50%</strong></span> the training data and a <span class="metric"><strong>6x</strong></span> higher compression ratio than prior work.
+  Our model delivers SOTA performance on trajectory- conditioned semantic occupancy forecasting while being <span class="metric"><strong>23×</strong></span>  more computationally efficient (<span class="metric"><strong>3.9×</strong></span> FPS speed‑up),
+  and achieves SOTA performance on unconditional semantic occupancy forecasting with <span class="metric"><strong>2x</strong></span> computational efficiency (<span class="metric"><strong>1.1x</strong></span> FPS speed‑up).</p>
+</section>
+      <section id="method"><h2>Method</h2><p>
+
+        <p class="note">
+        We attribute the inefficiency of existing models to <strong> redundant model parameters </strong> and <strong> excessive training time. </strong>
+        In order to facilitate systematic analyse of the transferability of dynamic learning, we first need to alleviate these two issues by a new data compressor and introduction of flow matching.
+        </p>
+
+        <img src="/OccFM/docs/source/images/vae.png" class="shadow" alt="Variational Autoencoder pipeline" />
+
+        <p class="note">
+          We abandoned the autoencoder based on the Stable&nbsp;Diffusion&nbsp;3 VAE structure used in almost all previous work.
+          The newly proposed VAE can not only compress <strong> arbitrary </strong> voxel-based LiDAR representation at a <strong> higher compression ratio </strong>,
+          but also with <strong> less reconstruction loss </strong>.
+        </p>
+
+        <img src="/OccFM/docs/source/images/cfm.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+
+
+        <p class="note">
+          The proposed CFM-based method obtained <strong> SOTA </strong> accuracy in both semantic occupancy forecasting w/w.o trajectory. Our method also demonstrates faster convergence speed and sample efficiency:
+          Our method only requires <strong> 200 </strong> epochs of training to exceed the results that previously required thousands of epochs to achieve. The model only have  <span class="metric">30.37M</span> parameters
+        </p>
+
+      </p></section>
+
+
+      <section id="Main results"><h2>Main results</h2><p>
+
+      </p></section>
+
+
+      <section id="Cross-domain">
+        <h3 class="subsection">Cross domain analyse: dynamic pretraining for 3 subtasks</h3>
+
+        <img src="/OccFM/docs/source/images/FLWM_finetuning.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+        <p class="note">
+          We report IOU/mIOU for every subtasks on different fine-turning data fractions w./w.o. pretraining. An up to <span class="metric"><strong>83%</strong></span> relative improvement (1s forecasting on semantic occupancy) can be observed among all of the experiments.
+          This outstanding transferability validates our designed pipeline learnt the prior dynamic knowledge, which can be useful in downstream tasks which suffering from data availability or expensive human annotation
+          <br></br>
+
+          Interestingly, here when we use only <span class="metric"><strong>10%</strong></span> of fine-turning data on semantic occupancy forecasting task (which is <span class="metric"><strong>5%</strong></span> of full training set of nuScense,
+          see paper for detail), the performance of model with pretrained dynamic learning module have exceeded the <strong>OccWorld</strong>.
+        </p>
+
+
+      </section>
+
+
+      <section id="Performance-evaluation">
+        <h3 class="subsection">Preformance evaluation</h3>
+
+        <img src="/OccFM/docs/source/images/abs_performance.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+
+        <p class="note">
+          From 32x compression ratio to even <span class="metric"><strong>768x</strong></span>, our proposed data compressor have SOTA performance - far from autoencoder used in previous SOTA method (left figure).
+          Based on these representations, our dynamic learning module (world model) have the SOTA performance on both accuracy and efficiency (right figure).
+        </p>
+
+
+        <p class="note">
+          <strong>Check our paper for further information!</strong>
+        </p>
+      </section>
+
+
+      <section id="More-Visualization">
+        <h3 class="subsection">Semantic occupancy forecasting Visualization</h3>
+
+        <!-- 这里写你的结果表格 / 图片 / 文字 -->
+
+        <p class="note">
+          Our proposed module have better performance in both <strong>agent trajectory forcasting</strong> and <strong>physical/semantic consistency.</strong>
+          In most cases, our model provides more accurate estimates of the surrounding objects velocity and better spatio-temporal consistency.
+        </p>
+
+        <p class="note">
+          In each of the following video clips, the first 6 frames provide the conditional input for the forecast. <strong>This input is identical for all models (GT).</strong>
+          Following an intermediary frame displaying <strong>"Forecasting"</strong> the subsequent 6 frames show the generated results. <strong>We've circled the key differences in yellow.</strong>
+        </p>
+
+        <div class="wide-block">
+    <div class="loading-indicator" id="gif-loading">
+        Loading visualizations...
+    </div>
+
+    <div id="gif-comparison" class="comparison-container">
+
+        <div class="result-row">
+            <div class="result-grid">
+                <figure class="gt-item">
+                    <figcaption>Ground Truth</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/gt_78.gif" alt="Ground truth, scene 1">
+                </figure>
+                <figure>
+                    <figcaption>Our Model</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/ours_78.gif" alt="Our model, scene 1">
+                </figure>
+                <figure>
+                    <figcaption>OccWorld</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/occworld_78.gif" alt="OccWorld, scene 1">
+                </figure>
+                <figure>
+                    <figcaption>DOME</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/dome_78.gif" alt="DOME, scene 1">
+                </figure>
+            </div>
+            <p class="note">
+                Our model demonstrates improved <strong>temporal consistency</strong> for foreground objects: the forecasted vehicle voxel categories (highlighted in yellow circles) in OccWorld and DOME change over time, as shown in the figure above.
+            </p>
+        </div>
+
+        <div class="result-row">
+            <div class="result-grid">
+                <figure class="gt-item">
+                    <figcaption>Ground Truth</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/gt_666.gif" alt="Ground truth, scene 2">
+                </figure>
+                <figure>
+                    <figcaption>Our Model</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/ours_666.gif" alt="Our model, scene 2">
+                </figure>
+                <figure>
+                    <figcaption>OccWorld</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/occworld_666.gif" alt="OccWorld, scene 2">
+                </figure>
+                <figure>
+                    <figcaption>DOME</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/dome_666.gif" alt="DOME, scene 2">
+                </figure>
+            </div>
+            <p class="note">
+                Our model demonstrates better <strong>shape retention</strong> for foreground objects: the shape of the bus within the yellow circle undergoes deformation in the forecasts from both the occlusion OccWorld and DOME results.
+            </p>
+        </div>
+
+        <div class="result-row">
+            <div class="result-grid">
+                <figure class="gt-item">
+                    <figcaption>Ground Truth</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/gt_1099.gif" alt="Ground truth, scene 3">
+                </figure>
+                <figure>
+                    <figcaption>Our Model</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/ours_1099.gif" alt="Our model, scene 3">
+                </figure>
+                <figure>
+                    <figcaption>OccWorld</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/occworld_1099.gif" alt="OccWorld, scene 3">
+                </figure>
+                <figure>
+                    <figcaption>DOME</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/dome_1099.gif" alt="DOME, scene 3">
+                </figure>
+            </div>
+        </div>
+
+        <div class="result-row">
+            <div class="result-grid">
+                <figure class="gt-item">
+                    <figcaption>Ground Truth</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/gt_1301.gif" alt="Ground truth, scene 4">
+                </figure>
+                <figure>
+                    <figcaption>Our Model</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/ours_1301.gif" alt="Our model, scene 4">
+                </figure>
+                <figure>
+                    <figcaption>OccWorld</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/occworld_1301.gif" alt="OccWorld, scene 4">
+                </figure>
+                <figure>
+                    <figcaption>DOME</figcaption>
+                    <img src="/OccFM/docs/source/annotated_gif/dome_1301.gif" alt="DOME, scene 4">
+                </figure>
+            </div>
+            <p class="note">
+                Our model also demonstrates better accuracy in forecasting <strong>trajectories for non-ego vehicles</strong>, as indicated by the yellow circles in the figure above.
+            </p>
+        </div>
+
+    </div>
+    </div>
+
+
+
+
+      </section>
+
+
+
+
+      </section>
+
+
+      <section id="Dense-Vis">
+        <h3 class="subsection">Dense & Sparse occupancy forecasting (Pretrain) Visualization</h3>
+
+         <p class="note">
+          We also present the result of pretraining, our model can learn the dynamic knowledge on both sparse and dense non-semantic occupancy.
+        </p>
+
+
+        <div class="wide-block">
+          <div class="comparison-grid two-col dense-sparse">
+            <!-- 第 1 行 -->
+            <figure class="gt">
+              <figcaption>Dense&nbsp;GT</figcaption>
+              <img src="/OccFM/docs/source/non-semantic/dense_gt.gif" alt="Dense ground-truth">
+            </figure>
+
+            <figure>
+              <figcaption>Dense&nbsp;Ours</figcaption>
+              <img src="/OccFM/docs/source/non-semantic/dense_pred.gif" alt="Dense ours">
+            </figure>
+
+            <!-- 第 2 行 -->
+            <figure class="gt">
+              <figcaption>Sparse&nbsp;GT</figcaption>
+              <img src="/OccFM/docs/source/non-semantic/sparse_gt.gif" alt="Sparse ground-truth">
+            </figure>
+
+            <figure>
+              <figcaption>Sparse&nbsp;Ours</figcaption>
+              <img src="/OccFM/docs/source/non-semantic/sparse_pred.gif" alt="Sparse ours">
+            </figure>
+          </div>
+      </div>
+
+
+      </section>
+
+
+      <section id="bibtex">
+        <h2>BibTeX</h2>
+
+        <div class="code-box">
+          <!-- 复制按钮，图标来自 heroicons -->
+          <button class="copy-btn" onclick="copyBibtex(this)" title="Copy to clipboard">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 5.25H7A2.25 2.25 0 0 0 4.75 7.5v10.5A2.25 2.25 0 0 0 7 20.25h8a2.25 2.25 0 0 0 2.25-2.25V7.5A2.25 2.25 0 0 0 15 5.25z"/>
+              <path d="M9 3.75h8A2.25 2.25 0 0 1 19.25 6v10.5"/>
+            </svg>
+          </button>
+
+      <pre><code id="bibtex-snippet">
+    @article{liu2025towards,
+      title={Towards foundational LiDAR world models with efficient latent flow matching},
+      author={Liu, Tianran and Zhao, Shengwen and Rhinehart, Nicholas},
+      journal={arXiv preprint arXiv:2506.23434},
+      year={2025}
+    }
+      </code></pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+
+<script>
+
+function copyBibtex(btn){
+  const code = btn.parentElement.querySelector('#bibtex-snippet').innerText;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.title = "Copied!";
+    btn.querySelector('svg').style.fill = "#10b981";   // 变成绿色 √
+    setTimeout(()=>{
+      btn.title = "Copy to clipboard";
+      btn.querySelector('svg').style.fill = "";        // 颜色复原
+    }, 1500);
+  });
+}
+</script>
+
+
+<script>
+(async ()=>{
+  // 找到所有 GIF 图片
+  const imgs = Array.from(document.querySelectorAll('.result-grid img'));
+  const loadingIndicator = document.getElementById('gif-loading');
+  const comparisonContainer = document.getElementById('gif-comparison');
+
+  if (imgs.length === 0) return; // 如果没有图片就不执行
+
+  // 预加载所有 GIF
+  const loadPromises = imgs.map(img => {
+    return new Promise((resolve, reject) => {
+      const tempImg = new Image();
+      tempImg.onload = () => resolve(img);
+      tempImg.onerror = () => reject(new Error(`Failed to load ${img.src}`));
+      tempImg.src = img.src;
+    });
+  });
+
+  try {
+    // 等待所有图片加载完成
+    await Promise.all(loadPromises);
+
+    // 隐藏加载提示
+    loadingIndicator.classList.add('hidden');
+
+    // 短暂延迟后显示比较布局
+    setTimeout(() => {
+      comparisonContainer.classList.add('loaded');
+    }, 600);
+
+  } catch (error) {
+    console.warn('Some GIFs failed to load:', error);
+    // 即使有错误也显示内容
+    loadingIndicator.classList.add('hidden');
+    comparisonContainer.classList.add('loaded');
+  }
+})();
+</script>
+
+</body>
+
+</html>

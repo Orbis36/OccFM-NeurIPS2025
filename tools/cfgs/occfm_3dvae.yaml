@@ -1,0 +1,31 @@
+NAME: OccFmVAE3D
+
+CACHE_MODE: False # Use for cache, in cfm used for skip encoder
+MU_SIGMA_CACHE: False
+
+EVAL_INTERVAL: 1
+LOSS_MONITOR: 'loss'
+
+DATA_CONFIG:
+  _BASE_CONFIG_: tools/cfgs/dataset_configs/nuscenes_dataset.yaml
+  SEQUENCE_LENGTH: 6
+  WIN_SIZE: 3
+  SEM_MODE: True
+
+COMPRESSOR_CONFIG:
+    _BASE_CONFIG_: tools/cfgs/compressor_configs/vae_swin_x16_h16_3d.yaml
+
+LOSS:
+  RECON_LOSS_WEIGHT: 10
+  LOVASZ_LOSS_WEIGHT: 1
+  KL_DIVERGENCE_WEIGHT: 1
+
+OPTIMIZATION:
+  NAME: ADAM
+
+  BATCH_SIZE_PER_GPU: 1
+  NUM_EPOCHS: 40
+  BASE_LR: 6.0e-05
+  WARMUP_STEPS: 1000
+  MIN_LR_RATIO: 0.2
+  GRAD_NORM_CLIP: 5

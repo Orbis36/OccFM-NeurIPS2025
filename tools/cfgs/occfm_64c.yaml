@@ -1,0 +1,40 @@
+NAME: OccFM
+
+CACHE_MODE: True
+EVAL_INTERVAL: 1
+LOSS_MONITOR: 'mse_loss'
+
+DATA_CONFIG:
+    _BASE_CONFIG_: tools/cfgs/dataset_configs/nuscenes_dataset.yaml
+    PICKLE_PATH: {'train': './data/nusc_latent_vae/x64/nus_sem_occ_training.pkl',
+                  'test': './data/nusc_latent_vae/x64/nus_sem_occ_validation.pkl'}
+    SEQUENCE_LENGTH: 6
+    SEM_MODE: True
+
+COMPRESSOR_CONFIG:
+    _BASE_CONFIG_: tools/cfgs/compressor_configs/vae_swin_x64_h16.yaml
+    PRETRAIN_WEIGHT: logs/occfm_vae/100ep_3docc_sem_voxel_64c/ckpt/epoch=000087.ckpt
+
+TRANSITION_MODEL_CONFIG:
+    _BASE_CONFIG_: tools/cfgs/transition_configs/cfm_64c.yaml
+
+PLANNER_CONFIG:
+    NAME: EmptyPlanner
+    PASS: True
+
+LOSS:
+  UNCOND_P: 0.2
+  RESCALE_FACTOR: 10
+  SAMPLE_STEP: 10
+  ALPHA_STEP: 3
+  UNCOND_SCALE: 2
+
+OPTIMIZATION:
+    NAME: ADAM
+
+    BATCH_SIZE_PER_GPU: 4
+    NUM_EPOCHS: 200
+    BASE_LR: 2.0e-05
+    WARMUP_STEPS: 1000
+    MIN_LR_RATIO: 0.2
+    GRAD_NORM_CLIP: 5
