@@ -1,4 +1,4 @@
-<img src="https://github.com/Orbis36/OccFM/interneal_release/docs/source/images/logo.png" width="12.5%" align="left">
+<img src="docs/source/images/logo.png" width="12.5%" align="left">
 
 # Towards foundational LiDAR world models with efficient latent flow matching
 
@@ -16,17 +16,11 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2506.23434">
-    <img src="https://img.shields.io/badge/Paper-PDF-B82A24?style=for-the-badge&logo=adobe-acrobat-reader" alt="Paper">
-  </a>
+  <a href="https://arxiv.org/abs/2506.23434"><img src="https://img.shields.io/badge/Paper-PDF-B82A24?style=for-the-badge&logo=adobe-acrobat-reader" alt="Paper"></a>
   &nbsp;&nbsp;&nbsp;
-  <a href="https://your-project-page.com">
-    <img src="https://img.shields.io/badge/Project-Page-orange?style=for-the-badge&logo=your-project-logo" alt="Project">
-  </a>
+  <a href="https://your-project-page.com"><img src="https://img.shields.io/badge/Project-Page-orange?style=for-the-badge&logo=your-project-logo" alt="Project"></a>
   &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/Orbis36/OccFM">
-    <img src="https://komarev.com/ghpvc/?username=Orbis36&repo=AdaFlowMatchingWM-Web&color=blue&style=for-the-badge" alt="visitors">
-  </a>
+  <a href="https://github.com/Orbis36/OccFM-NeurIPS2025"> <img src="https://komarev.com/ghpvc/?username=Orbis36&repo=OccFM-NeurIPS2025&color=blue&style=for-the-badge" alt="visitors"> </a>
 </p>
 
 ## TODO List

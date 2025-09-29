@@ -533,7 +533,7 @@
        <header class="hero">
         <!-- <img class="hero-img" src="images/logo.svg" alt="Project logo" /> -->
         <div class="hero-title">
-          <img class="logo" src="/OccFM/docs/source/images/logo.png" alt="Project logo">
+          <img class="logo" src="source/images/logo.png" alt="Project logo">
           <h1 class="title"><span class="nowrap">Towards foundational LiDAR world models </span><br><span class="nowrap">with efficient latent flow matching</span></h1>
         </div>
         <div class="paper-meta">
@@ -586,7 +586,7 @@
         In order to facilitate systematic analyse of the transferability of dynamic learning, we first need to alleviate these two issues by a new data compressor and introduction of flow matching.
         </p>
 
-        <img src="/OccFM/docs/source/images/vae.png" class="shadow" alt="Variational Autoencoder pipeline" />
+        <img src=" source/images/vae.png" class="shadow" alt="Variational Autoencoder pipeline" />
 
         <p class="note">
           We abandoned the autoencoder based on the Stable&nbsp;Diffusion&nbsp;3 VAE structure used in almost all previous work.
@@ -594,7 +594,7 @@
           but also with <strong> less reconstruction loss </strong>.
         </p>
 
-        <img src="/OccFM/docs/source/images/cfm.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+        <img src=" source/images/cfm.png" class="shadow" alt="Conditional Flow‑Matching framework" />
 
 
         <p class="note">
@@ -613,7 +613,7 @@
       <section id="Cross-domain">
         <h3 class="subsection">Cross domain analyse: dynamic pretraining for 3 subtasks</h3>
 
-        <img src="/OccFM/docs/source/images/FLWM_finetuning.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+        <img src=" source/images/FLWM_finetuning.png" class="shadow" alt="Conditional Flow‑Matching framework" />
         <p class="note">
           We report IOU/mIOU for every subtasks on different fine-turning data fractions w./w.o. pretraining. An up to <span class="metric"><strong>83%</strong></span> relative improvement (1s forecasting on semantic occupancy) can be observed among all of the experiments.
           This outstanding transferability validates our designed pipeline learnt the prior dynamic knowledge, which can be useful in downstream tasks which suffering from data availability or expensive human annotation
@@ -630,7 +630,7 @@
       <section id="Performance-evaluation">
         <h3 class="subsection">Preformance evaluation</h3>
 
-        <img src="/OccFM/docs/source/images/abs_performance.png" class="shadow" alt="Conditional Flow‑Matching framework" />
+        <img src=" source/images/abs_performance.png" class="shadow" alt="Conditional Flow‑Matching framework" />
 
         <p class="note">
           From 32x compression ratio to even <span class="metric"><strong>768x</strong></span>, our proposed data compressor have SOTA performance - far from autoencoder used in previous SOTA method (left figure).
@@ -670,19 +670,19 @@
             <div class="result-grid">
                 <figure class="gt-item">
                     <figcaption>Ground Truth</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/gt_78.gif" alt="Ground truth, scene 1">
+                    <img src=" source/annotated_gif/gt_78.gif" alt="Ground truth, scene 1">
                 </figure>
                 <figure>
                     <figcaption>Our Model</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/ours_78.gif" alt="Our model, scene 1">
+                    <img src=" source/annotated_gif/ours_78.gif" alt="Our model, scene 1">
                 </figure>
                 <figure>
                     <figcaption>OccWorld</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/occworld_78.gif" alt="OccWorld, scene 1">
+                    <img src=" source/annotated_gif/occworld_78.gif" alt="OccWorld, scene 1">
                 </figure>
                 <figure>
                     <figcaption>DOME</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/dome_78.gif" alt="DOME, scene 1">
+                    <img src=" source/annotated_gif/dome_78.gif" alt="DOME, scene 1">
                 </figure>
             </div>
             <p class="note">
@@ -694,19 +694,19 @@
             <div class="result-grid">
                 <figure class="gt-item">
                     <figcaption>Ground Truth</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/gt_666.gif" alt="Ground truth, scene 2">
+                    <img src=" source/annotated_gif/gt_666.gif" alt="Ground truth, scene 2">
                 </figure>
                 <figure>
                     <figcaption>Our Model</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/ours_666.gif" alt="Our model, scene 2">
+                    <img src=" source/annotated_gif/ours_666.gif" alt="Our model, scene 2">
                 </figure>
                 <figure>
                     <figcaption>OccWorld</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/occworld_666.gif" alt="OccWorld, scene 2">
+                    <img src=" source/annotated_gif/occworld_666.gif" alt="OccWorld, scene 2">
                 </figure>
                 <figure>
                     <figcaption>DOME</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/dome_666.gif" alt="DOME, scene 2">
+                    <img src=" source/annotated_gif/dome_666.gif" alt="DOME, scene 2">
                 </figure>
             </div>
             <p class="note">
@@ -718,19 +718,19 @@
             <div class="result-grid">
                 <figure class="gt-item">
                     <figcaption>Ground Truth</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/gt_1099.gif" alt="Ground truth, scene 3">
+                    <img src=" source/annotated_gif/gt_1099.gif" alt="Ground truth, scene 3">
                 </figure>
                 <figure>
                     <figcaption>Our Model</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/ours_1099.gif" alt="Our model, scene 3">
+                    <img src=" source/annotated_gif/ours_1099.gif" alt="Our model, scene 3">
                 </figure>
                 <figure>
                     <figcaption>OccWorld</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/occworld_1099.gif" alt="OccWorld, scene 3">
+                    <img src=" source/annotated_gif/occworld_1099.gif" alt="OccWorld, scene 3">
                 </figure>
                 <figure>
                     <figcaption>DOME</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/dome_1099.gif" alt="DOME, scene 3">
+                    <img src=" source/annotated_gif/dome_1099.gif" alt="DOME, scene 3">
                 </figure>
             </div>
         </div>
@@ -739,19 +739,19 @@
             <div class="result-grid">
                 <figure class="gt-item">
                     <figcaption>Ground Truth</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/gt_1301.gif" alt="Ground truth, scene 4">
+                    <img src=" source/annotated_gif/gt_1301.gif" alt="Ground truth, scene 4">
                 </figure>
                 <figure>
                     <figcaption>Our Model</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/ours_1301.gif" alt="Our model, scene 4">
+                    <img src=" source/annotated_gif/ours_1301.gif" alt="Our model, scene 4">
                 </figure>
                 <figure>
                     <figcaption>OccWorld</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/occworld_1301.gif" alt="OccWorld, scene 4">
+                    <img src=" source/annotated_gif/occworld_1301.gif" alt="OccWorld, scene 4">
                 </figure>
                 <figure>
                     <figcaption>DOME</figcaption>
-                    <img src="/OccFM/docs/source/annotated_gif/dome_1301.gif" alt="DOME, scene 4">
+                    <img src=" source/annotated_gif/dome_1301.gif" alt="DOME, scene 4">
                 </figure>
             </div>
             <p class="note">
@@ -786,23 +786,23 @@
             <!-- 第 1 行 -->
             <figure class="gt">
               <figcaption>Dense&nbsp;GT</figcaption>
-              <img src="/OccFM/docs/source/non-semantic/dense_gt.gif" alt="Dense ground-truth">
+              <img src=" source/non-semantic/dense_gt.gif" alt="Dense ground-truth">
             </figure>
 
             <figure>
               <figcaption>Dense&nbsp;Ours</figcaption>
-              <img src="/OccFM/docs/source/non-semantic/dense_pred.gif" alt="Dense ours">
+              <img src=" source/non-semantic/dense_pred.gif" alt="Dense ours">
             </figure>
 
             <!-- 第 2 行 -->
             <figure class="gt">
               <figcaption>Sparse&nbsp;GT</figcaption>
-              <img src="/OccFM/docs/source/non-semantic/sparse_gt.gif" alt="Sparse ground-truth">
+              <img src=" source/non-semantic/sparse_gt.gif" alt="Sparse ground-truth">
             </figure>
 
             <figure>
               <figcaption>Sparse&nbsp;Ours</figcaption>
-              <img src="/OccFM/docs/source/non-semantic/sparse_pred.gif" alt="Sparse ours">
+              <img src=" source/non-semantic/sparse_pred.gif" alt="Sparse ours">
             </figure>
           </div>
       </div>
