@@ -1,6 +1,13 @@
-<img src="docs/source/images/logo.png" width="12.5%" align="left">
-
-# Towards foundational LiDAR world models with efficient latent flow matching
+<table>
+  <tr>
+    <td valign="top" width="100">
+      <img src="docs/source/images/logo.png" alt="Project Logo">
+    </td>
+    <td valign="top">
+      <h1>Towards foundational LiDAR world models with efficient latent flow matching</h1>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <strong>NeurIPS 2025</strong>
