@@ -1,6 +1,6 @@
-<table>
+<table border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td valign="top" width="100">
+    <td valign="top" width="100" style="padding-right: 20px;">
       <img src="docs/source/images/logo.png" alt="Project Logo">
     </td>
     <td valign="top">
