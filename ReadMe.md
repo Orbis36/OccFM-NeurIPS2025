@@ -25,8 +25,8 @@
 
 ## TODO List
 - [x] Release codes
-- [ ] Semantic forecasting weights release
-- [ ] Weights for occupancy FVD measurement
+- [x] Semantic forecasting weights release
+- [x] Weights for occupancy FVD measurement
 
 ## Setup environment
 ```shell
@@ -35,9 +35,9 @@ pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https
 pip install nuscenes_devkit matplotlib==3.10.3 einops einops_exts pyyaml easydict wandb rich
 ```
 ## Download cached latent & pickle files
-Please download the cached latent here 
+Please download the cached latent from [Hugging Face](https://huggingface.co/Orbis36/OccFM/tree/main).
 
-The data folder should looks like: 
+The data and logs folder should looks like: 
 ```text
 OccFM/data/nusc_latent_vae/
 ├── x16
@@ -45,9 +45,6 @@ OccFM/data/nusc_latent_vae/
 │   └── nus_sem_occ_validation.pkl
 ```
 
-Please download the related weights here
-
-The logs folder should looks like: 
 ```text
 OccFM/logs/
 ├── occfm/
@@ -81,7 +78,7 @@ OccFM/logs/
         └── occfm_fut.yaml
 ```
 
-## Model Evaluation
+## Model Training / Evaluation
 
 ### VAE for data compression
 
@@ -150,6 +147,31 @@ python -m torch.distributed.run \
 Benefiting from the low informantion loss during VAE reconstruction that we propose, it is in fact highly suitable for evaluating the generative quality of OCC models using the Inception method.
 Specifically, we incorporated temporal processing components into both the encoder and decoder stages to enable the network to capture sequential information for calculating the FVD.
 
+The time window for calculating the FVD weight in our release is 6. You must first cache all predicted occupancy data. 
+
+- For nuscenes, the size is [6, 200, 200, 16], with each batch stored as a separate file. Finally, compute the FVD using the following command, replacing `path` with the actual directory where your files are stored.
+- For FID, please use the weights and YAML file for the VAE under 100ep_3docc_sem_voxel.
+```shell
+python tools/test_fid.py
+--eval_model
+<path to the occupancy forecasted>
+--fix_random_seed
+--ckpt
+./logs/occfm_3dvae/ori/ckpt/epoch=000040.ckpt
+--cfg_file
+./tools/cfgs/occfm_3dvae.yaml
+```
+
+### Citation
+If you find our work interesting, don't forget to cite us:
+```text
+@article{liu2025towards,
+  title={Towards foundational LiDAR world models with efficient latent flow matching},
+  author={Liu, Tianran and Zhao, Shengwen and Rhinehart, Nicholas},
+  journal={arXiv preprint arXiv:2506.23434},
+  year={2025}
+}
+```
 
 
 

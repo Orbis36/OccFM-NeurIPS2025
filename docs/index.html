@@ -384,6 +384,25 @@
     }
     .nowrap{white-space:nowrap;}
 
+        /* 论文场合/会议行 */
+    .venue {
+      margin-top: .2rem;
+      text-align: center;   /* 保险起见，即使不依赖 .hero 的居中 */
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #6b7280;
+    }
+
+    /* 想要“胶囊徽章”效果就加这个类 */
+    .venue.badge {
+      display: inline-block;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      color: #4338ca;
+    }
+
     /* --- 响应式 GIF 网格修复 (最终版 V3) --- */
 
     /* 1. 仅当屏幕装不下 1500px 时，才让容器自适应 */
@@ -536,6 +555,9 @@
           <img class="logo" src="source/images/logo.png" alt="Project logo">
           <h1 class="title"><span class="nowrap">Towards foundational LiDAR world models </span><br><span class="nowrap">with efficient latent flow matching</span></h1>
         </div>
+           <p class="venue">NeurIPS 2025</p>
+
+
         <div class="paper-meta">
           <!-- 作者行 -->
           <p class="authors">

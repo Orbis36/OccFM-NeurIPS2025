@@ -77,10 +77,10 @@ class NuScenesDataset(DatasetTemplate):
         sample_idx = self.valid_idx[idx]
         data_dict = {
             'paths': self.all_samples[sample_idx: sample_idx + self.safe_length],
-            'trajectory': np.concat(self.traj[sample_idx: sample_idx + self.safe_length])
+            'trajectory': np.concatenate(self.traj[sample_idx: sample_idx + self.safe_length])
         }
         if self.cache_mode:
-            x_sampled = np.concat(self.x_sampled[sample_idx: sample_idx + self.safe_length])
+            x_sampled = np.concatenate(self.x_sampled[sample_idx: sample_idx + self.safe_length])
 
             repeat = self.sequence_length - self.hist_last
             if repeat > 0:
